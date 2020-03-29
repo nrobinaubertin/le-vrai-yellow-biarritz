@@ -123,6 +123,7 @@ with open(target + os.sep + "index.html", 'w') as outputFile:
                 document.querySelectorAll('a.tag').forEach(n => n.addEventListener('click', e => {{e.preventDefault(); playTag(n.id)}}));
                 if (location.hash) {{
                     playTag(location.hash.slice(1));
+                    setTimeout(_ => window.scrollTo(0, 0));
                 }}
             </script>
         </body>
