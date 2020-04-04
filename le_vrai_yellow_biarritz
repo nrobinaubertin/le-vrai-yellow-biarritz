@@ -40,8 +40,9 @@ def match_target_amplitude(sound, target_dBFS):
     return sound.apply_gain(change_in_dBFS)
 
 for t in trackList:
-    normalized_sound = match_target_amplitude(t["mp3"], target_dBFS)
-    normalized_sound.export(t["file"], format="mp3")
+    if abs(target_dBFS - t["dBFS"]) > 1:
+        normalized_sound = match_target_amplitude(t["mp3"], target_dBFS)
+        normalized_sound.export(t["file"], format="mp3")
 
 colors = [
     "#2b5764",
@@ -109,7 +110,7 @@ with open(target + os.sep + "index.html", 'w') as outputFile:
                 id="currentTag"
                 class="p-5 text-center mb-5 bg-light"
                 style="display:none"
-                onclick="document.getElementById('audioTag').play()"
+                onclick="playTag(location.hash.slice(1))"
             >
                 <div class="display-4 mb-2 text-muted" style="overflow:hidden"></div>
                 <audio id="audioTag" class="mb-2"></audio>
