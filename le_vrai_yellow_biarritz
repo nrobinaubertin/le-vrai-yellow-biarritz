@@ -5,6 +5,7 @@ import os
 import re
 import json
 from slugify import slugify
+from pydub import AudioSegment
 
 target = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else "."
 print(target)
@@ -19,11 +20,28 @@ for i, trackFile in enumerate(files):
     path = os.path.relpath(trackFile.strip(), start=target)
     name = os.path.splitext(os.path.basename(trackFile))[0]
     slug = slugify(name)
+    mp3 = AudioSegment.from_file(trackFile)
     trackList.append({
         "path": path,
         "slug": slug,
         "name": name,
+        "dBFS": mp3.dBFS,
+        "file": trackFile.strip(),
+        "mp3": mp3,
     })
+
+target_dBFS = 0;
+for t in trackList:
+    target_dBFS += t["dBFS"]
+target_dBFS = target_dBFS / len(trackList);
+
+def match_target_amplitude(sound, target_dBFS):
+    change_in_dBFS = target_dBFS - sound.dBFS
+    return sound.apply_gain(change_in_dBFS)
+
+for t in trackList:
+    normalized_sound = match_target_amplitude(t["mp3"], target_dBFS)
+    normalized_sound.export(t["file"], format="mp3")
 
 colors = [
     "#2b5764",
